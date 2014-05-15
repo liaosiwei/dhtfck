@@ -51,6 +51,8 @@ def pack_host(host):
         addr = socket.inet_pton(socket.AF_INET, host)
     except (ValueError, socket.error):
         addr = socket.inet_pton(socket.AF_INET6, host)
+    except AttributeError:
+        addr = socket.inet_aton(host)
     return addr 
 
 def pack_port(port):
@@ -58,7 +60,11 @@ def pack_port(port):
 
 def unpack_host(host):
     if len(host) == 4:
-        return socket.inet_ntop(socket.AF_INET, host)
+        try:
+            addrstr = socket.inet_ntop(socket.AF_INET, host)
+        except AttributeError:
+            addrstr = socket.inet_ntoa(host)
+        return addrstr
     elif len(host) == 16: 
         return socket.inet_ntop(socket.AF_INET6, host)
 

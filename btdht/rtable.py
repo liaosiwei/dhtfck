@@ -33,7 +33,7 @@ class RoutingTable(object):
         # table for research purposes.
 
         if len(self.nodes) == 0:
-            raise RuntimeError, "No nodes in routing table!"
+            raise(RuntimeError, "No nodes in routing table!")
 
         # Sort the entire routing table by distance to the target
         # and return the top N matches

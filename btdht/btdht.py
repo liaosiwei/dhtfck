@@ -12,8 +12,10 @@ from .htable import HashTable
 from .bencode import bdecode, BTFailure
 from .node import Node
 from .utils import decode_nodes, encode_nodes, random_node_id, unpack_host, unpack_hostport
+from .postprocess import *
 
 logger = logging.getLogger(__name__)
+
 
 class DHTRequestHandler(SocketServer.BaseRequestHandler):
 
@@ -154,17 +156,30 @@ class DHTRequestHandler(SocketServer.BaseRequestHandler):
         elif query_type == "get_peers":
             logger.debug("handle query get_peers")
             node.pong(socket=self.server.socket, trans_id = trans_id, sender_id=self.server.dht.node._id, lock=self.server.send_lock)
+            info_hash = args["info_hash"].encode("hex")
+            filename = fetch_name(info_hash)
+            if filename:
+                print " ".join((client_host, filename, info_hash))
+            else:
+                print  " ".join((client_host, info_hash))
             return
         elif query_type == "announce_peer":
             logger.debug("handle query announce_peer")
             node.pong(socket=self.server.socket, trans_id = trans_id, sender_id=self.server.dht.node._id, lock=self.server.send_lock)
+            info_hash = args["info_hash"].encode("hex")
+            filename = fetch_name(info_hash)
+            if filename:
+                print " ".join((client_host, filename, info_hash))
+            else:
+                print  " ".join((client_host, info_hash))
             return
         else:
             logger.error("Unknown query type: %s" % (query_type))
 
     def handle_error(self, message):
-        logger.debug("We got error message from: ")
+        logger.error("We got error message from: ")
         return
+
 
 class DHTServer(SocketServer.ThreadingMixIn, SocketServer.UDPServer):
     def __init__(self, host_address, handler_cls):
@@ -263,12 +278,12 @@ class DHT(object):
             time.sleep(self.iteration_timeout)
 
     def stop(self):
-        self.running = False
+        if self.running:
+            self.running = False
 
-        self.iterative_thread.join()
-        logger.debug("Stopped iterative loop")
+            self.iterative_thread.join()
+            logger.debug("Stopped iterative loop")
 
         self.server.shutdown()
         self.server_thread.join()
         logger.debug("Stopped server thread")
-           
