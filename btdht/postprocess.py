@@ -3,13 +3,19 @@ from urllib import urlopen
 from lxml import etree
 
 
-def fetch_name(info_hash):
-    url = "https://torrentz.eu/%s" % info_hash
+def fetch_name(info):
+    url = "https://torrentz.eu/%s" % info
     response = urlopen(url)
     html = response.read()
     tree = etree.HTML(html)
-    for tr in tree.xpath("//div[@class='files']/ul//ul/li"):
-        return tr.text
+    try:
+        size = tree.xpath("//div[@class='files']/div")[0].text
+        fold_name = tree.xpath("//div[@class='files']/ul/li[@class='t']")[0].text
+        files = "|".join(tr.text.strip() for tr in tree.xpath("//div[@class='files']/ul//ul//li"))
+    except (IndexError, AttributeError):
+        return None
+    else:
+        return fold_name, size, files
 
 
 if __name__ == "__main__":

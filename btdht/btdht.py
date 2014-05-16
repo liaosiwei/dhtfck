@@ -130,7 +130,7 @@ class DHTRequestHandler(SocketServer.BaseRequestHandler):
         query_type = message["q"]
         args = message["a"]
         node_id = args["id"]
-
+        print(args)
         client_host, client_port = self.client_address
         logger.debug("Query message %s from %s:%d, id:%r" % (query_type, client_host, client_port, node_id.encode("hex")))
         
@@ -157,24 +157,24 @@ class DHTRequestHandler(SocketServer.BaseRequestHandler):
             logger.debug("handle query get_peers")
             node.pong(socket=self.server.socket, trans_id = trans_id, sender_id=self.server.dht.node._id, lock=self.server.send_lock)
             info_hash = args["info_hash"].encode("hex")
-            filename = fetch_name(info_hash)
-            if filename:
-                print " ".join((client_host, filename, info_hash))
+            res = fetch_name(info_hash)
+            if res:
+                print " ".join((client_host, " ".join(res), info_hash))
             else:
-                print  " ".join((client_host, info_hash))
+                print " ".join((client_host, info_hash))
             return
         elif query_type == "announce_peer":
             logger.debug("handle query announce_peer")
             node.pong(socket=self.server.socket, trans_id = trans_id, sender_id=self.server.dht.node._id, lock=self.server.send_lock)
             info_hash = args["info_hash"].encode("hex")
-            filename = fetch_name(info_hash)
-            if filename:
-                print " ".join((client_host, filename, info_hash))
+            res = fetch_name(info_hash)
+            if res:
+                print " ".join((client_host, " ".join(res), info_hash))
             else:
-                print  " ".join((client_host, info_hash))
+                print " ".join((client_host, info_hash))
             return
         else:
-            logger.error("Unknown query type: %s" % (query_type))
+            logger.error("Unknown query type: %s" % query_type)
 
     def handle_error(self, message):
         logger.error("We got error message from: ")

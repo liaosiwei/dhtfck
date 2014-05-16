@@ -5,7 +5,7 @@ import threading
 
 
 def dhtcrawler(selfaddr, bootaddr, bootinfo):
-    MAX_WORKING_TIME = 60*4
+    MAX_WORKING_TIME = 60*10
     dht = DHT(host=selfaddr[0], port=selfaddr[1])
     dht.start()
     dht.bootstrap(bootaddr[0], bootaddr[1])
@@ -42,7 +42,7 @@ if __name__ == "__main__":
 
     for thread in threads:
         thread.start()
-        time.sleep(1)
+        time.sleep(2)
 
 
     # Find me peers for that torrent hashes
